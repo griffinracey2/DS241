@@ -1,0 +1,91 @@
+---
+title: "Class Exploration of 4 Oct"
+author: "Griffin Racey"
+date: "4 October 2021"
+output: html_notebook
+---
+
+## Predicting Spring Enrollment of MA132
+
+Goal - Develop a model to predict next semester's MA132 enrollment.
+
+
+## Packages 
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+## Read data
+
+Using the file from moodle:
+
+```{r}
+df1=read_csv("U:/CU_ACAD_DEPT_WHEN_OFF_ENRL_22740.csv",
+             skip=1) %>% clean_names()
+view(df1)
+```
+## Clean data for Fall Calc 1
+
+```{r}
+clean_df1=df1 %>%
+  
+  ## Only Math courses
+  filter(subject == "MA") %>%
+  
+   ## Separate Terms into two columns
+  separate(term_8,c("term","year")) %>%
+  
+  ## Only Fall Calc 1 
+  filter(catalog == "131" & term == "Fall") %>%
+  
+
+  ## Filtering to only lecture sections
+  filter(component == "LEC")
+view(clean_df1)
+```
+
+## Select only relevant columns
+
+```{r}
+dfcount1=clean_df1 %>%
+  select("year","title","tot_enrl") %>%
+    group_by(year,title) %>% 
+    summarise(tot_enrl = sum(tot_enrl))
+
+view(dfcount1)
+```
+```{r}
+clean_df2=df1 %>%
+  
+  ## Only Math courses
+  filter(subject == "MA") %>%
+  
+   ## Separate Terms into two columns
+  separate(term_8,c("term","year")) %>%
+  
+  ## Only Spring Calc 2 
+  filter(catalog == "132" & term == "Spring") %>%
+  
+
+  ## Filtering to only lecture sections
+  filter(component == "LEC")
+view(clean_df2)
+```
+
+```{r}
+dfcount2=clean_df2 %>%
+  select("year","title","tot_enrl") %>%
+    group_by(year,title) %>% 
+    summarise(tot_enrl = sum(tot_enrl))
+
+view(dfcount2)
+```
+
+## Plot
+
+```{r}
+ggplot(data = dfcount) +
+  geom_point(mapping = aes(x = dfcount1$tot_enrl, y = dfcount2$tot_enrl))
+```
+

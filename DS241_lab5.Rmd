@@ -1,0 +1,217 @@
+---
+title: "Lab 04 - La Quinta is Spanish for next to Denny's, Pt. 2"
+author: "Griffin Racey"
+date: "18 Oct 2021"
+output: github_document
+---
+
+### Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse) 
+library(dsbox) 
+library(maps)
+```
+
+```{r load-data, message = FALSE}
+states <- read_csv("states.csv")
+```
+
+### Exercise 1
+
+```{r}
+dn_ak <- dennys %>%
+  filter(state == "AK") %>%
+  mutate(establishment = "Denny's")
+nrow(dn_ak)
+```
+
+
+### Exercise 2
+
+```{r}
+lq_ak <- laquinta %>%
+  filter(state == "AK") %>%
+  mutate(establishment = "Laquinta")
+nrow(lq_ak)
+```
+
+### Exercise 3
+
+Joining the two dataframes
+```{r}
+dn_lq_ak <- full_join(dn_ak, lq_ak, by = "state")
+dn_lq_ak
+```
+
+...
+
+### Exercise 4
+The 5 obersvations are joined, but there are variables with .x and .y to mark the difference in the variables between the two data frames.
+
+...
+
+### Exercise 5
+```{r}
+haversine <- function(long1, lat1, long2, lat2, round = 3) {
+  # convert to radians
+  long1 = long1 * pi / 180
+  lat1  = lat1  * pi / 180
+  long2 = long2 * pi / 180
+  lat2  = lat2  * pi / 180
+  
+  R = 6371 # Earth mean radius in km
+  
+  a = sin((lat2 - lat1)/2)^2 + cos(lat1) * cos(lat2) * sin((long2 - long1)/2)^2
+  d = R * 2 * asin(sqrt(a))
+  
+  return( round(d,round) ) # distance in km
+}
+```
+
+...
+
+### Exercise 6
+```{r}
+dn_lq_ak <- dn_lq_ak %>%
+  mutate(distance = haversine(longitude.x,latitude.x,longitude.y,latitude.y, round = 3))
+dn_lq_ak
+```
+
+
+...
+
+### Exercise 7
+
+```{r}
+dn_lq_ak_mindist <- dn_lq_ak %>%
+  group_by(address.x,address.y) %>%
+  select(address.x,address.y,distance) %>%
+  rename(dennys_address = address.x, laquinta_address = address.y) %>%
+  filter(distance <= 10)
+dn_lq_ak_mindist
+```
+...
+### Exercise 8
+```{r}
+dn_lq_ak_map <- bind_rows(dn_ak,lq_ak)
+dn_lq_ak_map
+
+ggplot(dn_lq_ak_map, mapping = aes(x = longitude, y = latitude, color = establishment, alpha ~ .4)) + geom_point()
+```
+
+...
+### Exercise 9
+```{r}
+dn_nc <- dennys %>%
+  filter(state == "NC") %>%
+mutate(establishment = "Denny's")
+nrow(dn_nc)
+
+lq_nc <- laquinta %>%
+  filter(state == "NC") %>%
+  mutate(establishment = "Laquinta")
+nrow(lq_nc)
+```
+```{r}
+dn_lq_nc <- full_join(dn_nc, lq_nc, by = "state")
+dn_lq_nc
+
+dn_lq_nc <- dn_lq_nc %>%
+  mutate(distance = haversine(longitude.x,latitude.x,longitude.y,latitude.y, round = 3))
+dn_lq_nc
+
+dn_lq_nc_min <- dn_lq_nc %>%
+  select(address.x, address.y, distance)%>%
+  group_by(address.x, address.y) %>%
+  summarise(closest = min(distance))%>%
+  filter(closest<=10) %>%
+  arrange(closest)
+dn_lq_nc_min
+
+```
+```{r}
+dn_lq_nc_map <- bind_rows(dn_nc,lq_nc)
+dn_lq_nc_map
+
+ggplot(dn_lq_nc_map, mapping = aes(x = longitude, y = latitude, color = establishment, alpha ~ .4)) + geom_point()
+```
+
+
+...
+### Exercise 10
+```{r}
+dn_tn <- dennys %>%
+  filter(state == "TN") %>%
+  mutate(establishment = "Denny's")
+nrow(dn_tn)
+
+lq_tn <- laquinta %>%
+  filter(state == "TN") %>%
+  mutate(establishment = "Laquinta")
+nrow(lq_tn)
+```
+```{r}
+dn_lq_tn <- full_join(dn_tn, lq_tn, by = "state")
+dn_lq_tn
+
+dn_lq_tn <- dn_lq_tn %>%
+  mutate(distance = haversine(longitude.x,latitude.x,longitude.y,latitude.y, round = 3))
+dn_lq_tn
+
+dn_lq_tn_min <- dn_lq_tn %>%
+  select(address.x, address.y, distance)%>%
+  group_by(address.x, address.y) %>%
+  summarise(closest = min(distance))%>%
+  filter(closest<=10) %>%
+  arrange(closest)
+dn_lq_tn_min
+
+```
+```{r}
+dn_lq_tn_map <- bind_rows(dn_tn,lq_tn)
+dn_lq_tn_map
+
+ggplot(dn_lq_tn_map, mapping = aes(x = longitude, y = latitude, color = establishment, alpha ~ .4)) + geom_point()
+```
+
+
+...
+
+### Exercise 11
+```{r}
+dn_ny <- dennys %>%
+  filter(state == "NY") %>%
+  mutate(establishment = "Denny's")
+nrow(dn_ny)
+
+lq_ny <- laquinta %>%
+  filter(state == "NY") %>%
+  mutate(establishment = "Laquinta")
+nrow(lq_ny)
+```
+```{r}
+dn_lq_ny <- full_join(dn_ny, lq_ny, by = "state")
+dn_lq_ny
+
+dn_lq_ny <- dn_lq_ny %>%
+  mutate(distance = haversine(longitude.x,latitude.x,longitude.y,latitude.y, round = 3))
+dn_lq_ny
+
+dn_lq_ny_min <- dn_lq_ny %>%
+  select(address.x, address.y, distance)%>%
+  group_by(address.x, address.y) %>%
+  summarise(closest = min(distance))%>%
+  filter(closest<=10) %>%
+  arrange(closest)
+dn_lq_ny_min
+
+```
+
+```{r}
+dn_lq_ny_map <- bind_rows(dn_ny,lq_ny)
+dn_lq_ny_map
+
+ggplot(dn_lq_ny_map, mapping = aes(x = longitude, y = latitude, color = establishment, alpha ~ .4)) + geom_point()
+```
+
